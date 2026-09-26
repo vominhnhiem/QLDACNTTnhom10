@@ -155,6 +155,14 @@
           </div>
           <span class="w-2 h-2 rounded-full bg-[#06B6D4] ml-auto shrink-0"></span>
         </a>
+        <a class="flex items-center px-space-sm py-2 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-colors group" href="/create-contract.html">
+          <span class="material-symbols-outlined mr-space-sm text-[20px] text-emerald-400 group-hover:text-white transition-colors">post_add</span>
+          <span class="text-sm truncate">Lập hợp đồng mới</span>
+        </a>
+        <a class="flex items-center px-space-sm py-2 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-colors group" href="/contract-detail.html">
+          <span class="material-symbols-outlined mr-space-sm text-[20px] text-cyan-300 group-hover:text-white transition-colors">description</span>
+          <span class="text-sm truncate">Chi tiết hợp đồng</span>
+        </a>
         <a class="flex items-center px-space-sm py-2 rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-colors group" href="#">
           <span class="material-symbols-outlined mr-space-sm text-[20px] text-slate-400 group-hover:text-white transition-colors">badge</span>
           <span class="text-sm truncate">Quầy lễ tân Check-in</span>
@@ -265,10 +273,16 @@
 
             <!-- CỤM NÚT HÀNH ĐỘNG ĐẦU TRANG -->
             <div class="flex items-center gap-space-sm flex-wrap">
-              <!-- Nút Lập hợp đồng mới: Chuyển màn hình trực tiếp sang contracts.html -->
-              <a href="/contracts.html" class="h-10 px-4 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-md flex items-center justify-center gap-2 text-sm font-semibold transition-all transform active:scale-98 cursor-pointer">
+              <!-- Nút Lập hợp đồng mới: Chuyển màn hình trực tiếp sang create-contract.html -->
+              <a href="/create-contract.html" class="h-10 px-4 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white shadow-md flex items-center justify-center gap-2 text-sm font-semibold transition-all transform active:scale-98 cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">post_add</span>
                 <span>+ Lập Hợp đồng mới</span>
+              </a>
+
+              <!-- Nút Xem chi tiết Hợp đồng -->
+              <a href="/contract-detail.html" class="h-10 px-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/40 flex items-center justify-center gap-1.5 text-sm font-semibold transition-colors shadow-xs">
+                <span class="material-symbols-outlined text-[18px] text-cyan-600">description</span>
+                <span>Chi tiết Hợp đồng</span>
               </a>
               
               <!-- Nút Primary nổi bật: + Tạo gói tập mới (màu xanh dương đậm/gradient theo Yêu Cầu 1) -->
@@ -1712,11 +1726,11 @@
     // 6. XỬ LÝ CHUYỂN MÀN HÌNH "LẬP HỢP ĐỒNG"
     // ==========================================
     function openContractModal() {
-      window.location.href = '/contracts.html';
+      window.location.href = '/create-contract.html';
     }
 
     function quickSignContract(packageName, price, days) {
-      window.location.href = '/contracts.html?pkg=' + encodeURIComponent(packageName);
+      window.location.href = '/create-contract.html?pkg=' + encodeURIComponent(packageName);
     }
 
     function closeContractModal() {
@@ -1741,7 +1755,7 @@
       const fullLink = document.getElementById('modalOpenFullContractLink');
       if (fullLink) {
         const pkgName = opt.text.split('(')[0].trim();
-        fullLink.href = '/contracts.html?pkg=' + encodeURIComponent(pkgName);
+        fullLink.href = '/create-contract.html?pkg=' + encodeURIComponent(pkgName);
       }
 
       calcContractTotal();

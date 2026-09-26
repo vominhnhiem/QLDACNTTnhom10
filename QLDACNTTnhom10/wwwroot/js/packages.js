@@ -1,6 +1,9 @@
-// =========================================================
-// packages.js - Quản lý Gói tập (Có sẵn Mock Data & cấu trúc API)
-// =========================================================
+// =============================================================================
+// packages.js - Quản lý Gói tập (API Service & Mock Data Fallback)
+// FitManage Gym & Yoga Suite (TASK-349)
+// =============================================================================
+
+const API_BASE = '/api';
 
 // Dữ liệu giả lập (Mock Data) chuẩn theo database PACKAGES
 let packagesList = [
@@ -10,6 +13,78 @@ let packagesList = [
   { packageID: 4, packageName: "Gói Yoga VIP (3 Tháng)", durationDays: 90, totalSessions: 72, price: 2100000, isActive: true },
   { packageID: 5, packageName: "Gói Thử Nghiệm 7 Ngày", durationDays: 7, totalSessions: 7, price: 150000, isActive: false }
 ];
+
+// =============================================================================
+// API SERVICE CALLS (fetch API)
+// =============================================================================
+
+/**
+ * Lấy danh sách gói tập: GET /api/packages
+ */
+async function fetchPackagesApi() {
+  try {
+    const res = await fetch(`${API_BASE}/packages`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        packagesList = data;
+      }
+    }
+  } catch (err) {
+    console.warn('[API] Lỗi khi gọi GET /api/packages, dùng dữ liệu mẫu cục bộ.', err);
+  }
+  return packagesList;
+}
+
+/**
+ * Tạo mới gói tập: POST /api/packages
+ */
+async function createPackageApi(payload) {
+  try {
+    const res = await fetch(`${API_BASE}/packages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[API] Lỗi khi gọi POST /api/packages, thực thi lưu cục bộ.', err);
+  }
+  return null;
+}
+
+/**
+ * Cập nhật gói tập: PUT /api/packages/{id}
+ */
+async function updatePackageApi(id, payload) {
+  try {
+    const res = await fetch(`${API_BASE}/packages/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) return true;
+  } catch (err) {
+    console.warn('[API] Lỗi khi gọi PUT /api/packages/' + id, err);
+  }
+  return false;
+}
+
+// =============================================================================
+// UI RENDERING & CRUD
+// =============================================================================
 
 // Render bảng danh sách gói tập
 function renderPackagesTable(data) {
@@ -45,7 +120,9 @@ function renderPackagesTable(data) {
 
 // Tìm kiếm gói tập
 function filterPackages() {
-  const keyword = document.getElementById("searchPackageInput").value.toLowerCase().trim();
+  const input = document.getElementById("searchPackageInput");
+  if (!input) return;
+  const keyword = input.value.toLowerCase().trim();
   const filtered = packagesList.filter(p => p.packageName.toLowerCase().includes(keyword));
   renderPackagesTable(filtered);
 }
@@ -78,7 +155,7 @@ function closePackageModal() {
 }
 
 // Lưu Gói tập (Tạo mới hoặc Sửa)
-function handleSavePackage(event) {
+async function handleSavePackage(event) {
   event.preventDefault();
 
   const id = document.getElementById("packageId").value;
@@ -88,23 +165,29 @@ function handleSavePackage(event) {
   const price = parseFloat(document.getElementById("price").value);
   const isActive = document.getElementById("isActive").value === "true";
 
+  const payload = {
+    packageName: name,
+    durationDays: duration,
+    totalSessions: sessions,
+    price: price,
+    isActive: isActive
+  };
+
   if (id) {
     // Sửa gói
     const index = packagesList.findIndex(p => p.packageID === parseInt(id));
     if (index !== -1) {
-      packagesList[index] = { ...packagesList[index], packageName: name, durationDays: duration, totalSessions: sessions, price: price, isActive: isActive };
+      packagesList[index] = { ...packagesList[index], ...payload };
+      await updatePackageApi(id, payload);
       alert("Cập nhật gói tập thành công!");
     }
   } else {
     // Thêm mới
-    const newId = packagesList.length > 0 ? Math.max(...packagesList.map(p => p.packageID)) + 1 : 1;
+    const apiResult = await createPackageApi(payload);
+    const newId = apiResult?.packageID || (packagesList.length > 0 ? Math.max(...packagesList.map(p => p.packageID)) + 1 : 1);
     packagesList.unshift({
       packageID: newId,
-      packageName: name,
-      durationDays: duration,
-      totalSessions: sessions,
-      price: price,
-      isActive: isActive
+      ...payload
     });
     alert("Thêm gói tập mới thành công!");
   }
@@ -118,11 +201,13 @@ function togglePackageStatus(id) {
   const pkg = packagesList.find(p => p.packageID === id);
   if (pkg) {
     pkg.isActive = !pkg.isActive;
+    updatePackageApi(id, { isActive: pkg.isActive });
     renderPackagesTable(packagesList);
   }
 }
 
 // Khởi chạy khi load trang
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await fetchPackagesApi();
   renderPackagesTable(packagesList);
 });
