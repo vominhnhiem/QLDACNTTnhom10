@@ -378,14 +378,259 @@ function checkVietQrGateway() {
   triggerToast('Mở cổng sao kê cổng thanh toán VietQR Hub...');
 }
 
+// =============================================================================
+// MODAL GIA HẠN HỢP ĐỒNG (CONTRACT RENEWAL CONTROLLER)
+// =============================================================================
+
+const renewState = {
+  months: 6,
+  days: 180,
+  basePrice: 4500000,
+  discountPercent: 0.10,
+  voucherCode: 'LOYALTY10',
+  paymentMethod: 'vietqr',
+  renewType: 'current'
+};
+
 function handleRenewContractAction() {
-  const months = prompt('Nhập số tháng muốn gia hạn (VD: 3, 6, 12 tháng):', '12');
-  if (months && !isNaN(months)) {
-    apiRenewContract(mockContractDetails.contractID, parseInt(months)).then(() => {
-      triggerToast(`🎉 Đã gia hạn thành công thêm ${months} tháng cho hợp đồng #${mockContractDetails.contractID}!`);
-    });
-  }
+  openRenewContractModal();
 }
+
+function openRenewContractModal() {
+  const modal = document.getElementById('contract-modal-backdrop');
+  if (!modal) return;
+
+  // Điền dữ liệu từ thông tin hợp đồng hiện tại
+  const c = mockContractDetails;
+  setText('modalRenewContractTitle', `Gia hạn Hợp đồng #${c.contractID}`);
+  setText('modalRenewMemberName', c.member?.name || 'Hội viên');
+  setText('modalRenewMemberPhone', c.member?.phone || '');
+  setText('modalRenewMemberAvatar', c.member?.avatarLetters || 'NC');
+  setText('modalRenewMemberRank', c.member?.rank || 'Thẻ VIP Gold');
+  setText('modalRenewCurrentPackage', `Gói hiện tại: ${c.package?.name || 'Gym Diamond'}`);
+  setText('modalRenewOldEndDate', c.package?.endDate || '26/09/2027');
+
+  // Tính ngày bắt đầu mới (ngày tiếp theo ngày hết hạn cũ)
+  const oldEndDateStr = c.package?.endDate || '26/09/2027';
+  let oldEnd = parseDateDMY(oldEndDateStr);
+  const newStartDate = new Date(oldEnd);
+  newStartDate.setDate(newStartDate.getDate() + 1);
+
+  setText('modalRenewNewStartDate', formatDateDMY(newStartDate));
+
+  // Chọn mặc định +6 Tháng
+  selectRenewDuration(6, 4500000, 180);
+
+  modal.classList.remove('hidden');
+}
+
+function closeRenewContractModal() {
+  const modal = document.getElementById('contract-modal-backdrop');
+  if (modal) modal.classList.add('hidden');
+}
+
+// Chọn thời hạn gia hạn (+3T, +6T, +12T)
+function selectRenewDuration(months, price, days) {
+  renewState.months = months;
+  renewState.basePrice = price;
+  renewState.days = days;
+
+  // Cập nhật trạng thái active cho các nút
+  const btn3 = document.getElementById('renewBtn3M');
+  const btn6 = document.getElementById('renewBtn6M');
+  const btn12 = document.getElementById('renewBtn12M');
+
+  const activeClass = 'duration-btn flex flex-col items-center justify-center p-3 rounded-xl bg-primary/10 text-primary ring-2 ring-primary font-semibold transition-all relative text-center cursor-pointer border border-primary';
+  const inactiveClass = 'duration-btn flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all text-center cursor-pointer border border-outline-variant/30';
+
+  if (btn3) btn3.className = months === 3 ? activeClass : inactiveClass;
+  if (btn6) btn6.className = months === 6 ? activeClass : inactiveClass;
+  if (btn12) btn12.className = months === 12 ? activeClass : inactiveClass;
+
+  // Badge "Đang chọn"
+  const badge6M = document.getElementById('badgeSelected6M');
+  if (badge6M) {
+    badge6M.style.display = months === 6 ? 'inline-block' : 'none';
+  }
+
+  // Tính ngày hết hạn mới
+  const oldEndDateStr = mockContractDetails.package?.endDate || '26/09/2027';
+  let oldEnd = parseDateDMY(oldEndDateStr);
+  const newEndDate = new Date(oldEnd);
+  newEndDate.setDate(newEndDate.getDate() + days);
+
+  setText('modalRenewNewEndDate', formatDateDMY(newEndDate));
+  setText('modalRenewAddedDaysText', `✓ Thời hạn thêm ${days} ngày`);
+
+  calculateRenewPricing();
+}
+
+// Tính toán bảng giá & chiết khấu trong modal gia hạn
+function calculateRenewPricing() {
+  const discount = Math.round(renewState.basePrice * renewState.discountPercent);
+  const finalTotal = Math.max(0, renewState.basePrice - discount);
+
+  setText('modalRenewBaseLabel', `Giá niêm yết (Gói ${renewState.months} Tháng):`);
+  setText('modalRenewBasePrice', `${renewState.basePrice.toLocaleString('vi-VN')} đ`);
+  setText('modalRenewDiscountLabel', `Chiết khấu tri ân khách hàng (${Math.round(renewState.discountPercent * 100)}%):`);
+  setText('modalRenewDiscountAmount', `-${discount.toLocaleString('vi-VN')} đ`);
+  setText('modalRenewFinalTotal', `${finalTotal.toLocaleString('vi-VN')} đ`);
+}
+
+// Chuyển loại gia hạn (Gói hiện tại vs Nâng cấp)
+function onRenewTypeChange(type) {
+  renewState.renewType = type;
+  if (type === 'upgrade') {
+    // Giá nâng cấp lên Gói VIP All-Access Diamond
+    if (renewState.months === 3) renewState.basePrice = 3200000;
+    else if (renewState.months === 6) renewState.basePrice = 5800000;
+    else if (renewState.months === 12) renewState.basePrice = 9800000;
+    triggerToast('Đã chọn: Nâng cấp gói mới (Toàn quyền VIP Gym + Yoga + Sauna)');
+  } else {
+    // Giá gói hiện tại
+    if (renewState.months === 3) renewState.basePrice = 2400000;
+    else if (renewState.months === 6) renewState.basePrice = 4500000;
+    else if (renewState.months === 12) renewState.basePrice = 7600000;
+  }
+  calculateRenewPricing();
+}
+
+// Thay đổi mã Voucher
+function onRenewVoucherChange(val) {
+  const code = (val || '').trim().toUpperCase();
+  const badge = document.getElementById('modalRenewVoucherBadge');
+
+  if (code === 'LOYALTY10') {
+    renewState.discountPercent = 0.10;
+    if (badge) {
+      badge.innerText = 'Áp dụng thành công (10%)';
+      badge.className = 'px-2 py-0.5 rounded bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold shrink-0';
+    }
+  } else if (code === 'VIP20') {
+    renewState.discountPercent = 0.20;
+    if (badge) {
+      badge.innerText = 'Áp dụng thành công (20%)';
+      badge.className = 'px-2 py-0.5 rounded bg-emerald-700 text-white font-label-sm text-label-sm font-semibold shrink-0';
+    }
+  } else if (code === '') {
+    renewState.discountPercent = 0;
+    if (badge) {
+      badge.innerText = 'Chưa nhập mã';
+      badge.className = 'px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm shrink-0';
+    }
+  } else {
+    renewState.discountPercent = 0;
+    if (badge) {
+      badge.innerText = 'Mã không đúng';
+      badge.className = 'px-2 py-0.5 rounded bg-error-container text-error font-label-sm text-label-sm font-semibold shrink-0';
+    }
+  }
+  calculateRenewPricing();
+}
+
+// Chọn hình thức thanh toán gia hạn
+function selectRenewPaymentMethod(method) {
+  renewState.paymentMethod = method;
+
+  const tiles = document.querySelectorAll('.renew-pay-tile');
+  tiles.forEach(t => {
+    t.className = 'renew-pay-tile p-3 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container flex items-center justify-between transition-all cursor-pointer border border-outline-variant/30';
+    const check = t.querySelector('.material-symbols-outlined[style*="FILL"]');
+    if (check) check.remove();
+  });
+
+  const activeTileId = method === 'vietqr' ? 'renewPayVietQR' : (method === 'cash' ? 'renewPayCash' : 'renewPayPOS');
+  const activeTile = document.getElementById(activeTileId);
+  if (activeTile) {
+    activeTile.className = 'renew-pay-tile p-3 rounded-xl bg-primary/10 text-primary ring-2 ring-primary flex items-center justify-between transition-all cursor-pointer border border-primary';
+    const icon = document.createElement('span');
+    icon.className = 'material-symbols-outlined text-[18px] text-primary';
+    icon.style.fontVariationSettings = "'FILL' 1";
+    icon.innerText = 'check_circle';
+    activeTile.appendChild(icon);
+  }
+
+  const methodText = method === 'vietqr' ? 'VietQR Pro' : (method === 'cash' ? 'Tiền mặt tại quầy' : 'Quẹt thẻ POS');
+  triggerToast(`Đã chọn hình thức: ${methodText}`);
+}
+
+// Xác nhận gia hạn hợp đồng
+async function confirmRenewContract() {
+  const c = mockContractDetails;
+  const newEndDateStr = document.getElementById('modalRenewNewEndDate').innerText;
+  const totalAmountStr = document.getElementById('modalRenewFinalTotal').innerText;
+
+  // Gọi API Backend
+  await apiRenewContract(c.contractID, renewState.months);
+
+  // Cập nhật state dữ liệu hợp đồng
+  c.package.endDate = newEndDateStr;
+  c.package.remainingDays += renewState.days;
+  c.status = 'Active';
+
+  // Thêm sự kiện vào Audit Trail Timeline
+  const methodText = renewState.paymentMethod === 'vietqr' ? 'VietQR Pro' : (renewState.paymentMethod === 'cash' ? 'Tiền mặt' : 'Quẹt thẻ POS');
+  const now = new Date();
+  const timeStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  
+  c.auditTrail.events.unshift({
+    time: timeStr,
+    title: `Gia hạn hợp đồng (+${renewState.months} Tháng)`,
+    desc: `Đã thanh toán ${totalAmountStr} qua ${methodText}. Thời hạn hợp đồng mới kéo dài đến ${newEndDateStr}.`,
+    dotColor: "bg-primary"
+  });
+
+  // Re-render lại giao diện chi tiết hợp đồng
+  renderContractDetail(c);
+  renderAuditTrailEvents(c.auditTrail.events);
+
+  closeRenewContractModal();
+
+  triggerToast(`🎉 Gia hạn Hợp đồng #${c.contractID} thêm ${renewState.months} tháng thành công! Đã cập nhật hạn dùng đến ${newEndDateStr}.`);
+}
+
+// Cập nhật hiển thị dòng sự kiện audit trail
+function renderAuditTrailEvents(events) {
+  const container = document.querySelector('.relative.pl-6.space-y-5');
+  if (!container || !Array.isArray(events)) return;
+
+  container.innerHTML = events.map(e => `
+    <div class="relative flex flex-col gap-0.5">
+      <span class="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full ${e.dotColor || 'bg-primary'} ring-4 ring-surface-container-lowest"></span>
+      <div class="flex items-center justify-between">
+        <span class="font-title-md text-title-md text-on-surface font-bold">${e.title}</span>
+        <span class="font-label-sm text-label-sm text-on-surface-variant font-mono">${e.time}</span>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        ${e.desc}
+      </p>
+    </div>
+  `).join('');
+}
+
+// Helper date parsing (dd/mm/yyyy)
+function parseDateDMY(dateStr) {
+  if (!dateStr) return new Date();
+  const parts = dateStr.split('/');
+  if (parts.length === 3) {
+    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+  }
+  return new Date();
+}
+
+function formatDateDMY(d) {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+// Phím bấm ESC để đóng modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeRenewContractModal();
+  }
+});
 
 function handleFreezeContractAction() {
   const days = prompt('Nhập số ngày muốn bảo lưu hợp đồng (Tối đa 60 ngày):', '30');
@@ -411,4 +656,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Tải và hiển thị dữ liệu
   const contractData = await fetchContractDetail(contractId);
   renderContractDetail(contractData);
+
+  // Mở trực tiếp modal nếu có tham số ?renew=true
+  if (urlParams.get('renew') === 'true') {
+    setTimeout(openRenewContractModal, 300);
+  }
 });
+

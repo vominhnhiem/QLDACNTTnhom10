@@ -850,6 +850,249 @@
     </main>
   </div>
 
+  <!-- ==================== MODAL GIA HẠN HỢP ĐỒNG (STITCH CONTRACT RENEWAL) ==================== -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto" id="contract-modal-backdrop">
+    <!-- Modal Card (680px Width Centered) -->
+    <div class="relative w-full max-w-[680px] bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-6 transition-all duration-300 transform scale-100 flex flex-col border border-outline-variant/30">
+      
+      <!-- Modal Header -->
+      <div class="p-6 bg-surface-container-low/60 flex flex-col gap-3 relative border-b border-surface-container-high">
+        <!-- Close Button -->
+        <button class="absolute top-5 right-5 w-9 h-9 rounded-xl flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer" onclick="closeRenewContractModal()" title="Đóng cửa sổ" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+        <div class="flex items-center gap-3 pr-10 flex-wrap">
+          <div class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[20px]">history_edu</span>
+          </div>
+          <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold" id="modalRenewContractTitle">Gia hạn Hợp đồng #HD-2026-0892</span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-error-container/40 text-error font-label-sm text-label-sm font-semibold" id="modalRenewStatusBadge">
+            <span class="material-symbols-outlined text-[14px]">warning</span>
+            <span>Sắp hết hạn (Còn 5 ngày)</span>
+          </span>
+        </div>
+
+        <!-- Member Quick Details Bar -->
+        <div class="flex items-center gap-3 bg-surface-container-lowest p-2.5 rounded-xl shadow-sm border border-outline-variant/20">
+          <div class="w-9 h-9 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-title-md text-title-md font-bold" id="modalRenewMemberAvatar">
+            CN
+          </div>
+          <div class="flex items-center gap-2 flex-wrap text-on-surface">
+            <span class="font-title-md text-title-md font-bold" id="modalRenewMemberName">Nguyễn Đức Chí Nguyên</span>
+            <span class="text-outline-variant">•</span>
+            <span class="font-body-md text-body-md text-on-surface-variant font-mono" id="modalRenewMemberPhone">0908 123 456</span>
+            <span class="text-outline-variant">•</span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold" id="modalRenewMemberRank">
+              <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span>Diamond VIP</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div class="p-6 flex flex-col gap-6 max-h-[737px] overflow-y-auto">
+        <!-- Khối 1: Tóm tắt hợp đồng cũ -->
+        <div class="p-4 rounded-xl bg-surface-container-low flex flex-col gap-3 border border-outline-variant/20">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-secondary">fitness_center</span>
+              <span class="font-title-md text-title-md text-on-surface font-semibold" id="modalRenewCurrentPackage">Gói hiện tại: Gym Diamond 12 Tháng</span>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container-highest text-secondary font-label-sm text-label-sm font-medium">
+              <span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+              Đang hoạt động
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-body-sm font-body-sm flex-wrap gap-2">
+            <div class="flex items-center gap-1.5 text-on-surface-variant">
+              <span class="material-symbols-outlined text-[16px] text-outline">event_busy</span>
+              <span>Ngày hết hạn cũ:</span>
+              <span class="font-semibold text-on-surface font-mono" id="modalRenewOldEndDate">26/09/2027</span>
+            </div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm">
+              <span class="material-symbols-outlined text-[14px] text-primary">timelapse</span>
+              <span id="modalRenewUsageRatio">Đã sử dụng 53/365 ngày (14.5%)</span>
+            </div>
+          </div>
+          <!-- Usage Mini Bar -->
+          <div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+            <div class="bg-primary h-full rounded-full transition-all duration-500" id="modalRenewUsageBar" style="width: 14.5%;"></div>
+          </div>
+        </div>
+
+        <!-- Khối 2: Cấu hình gói gia hạn -->
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <span class="font-title-lg text-title-lg text-on-surface tracking-tight font-bold">Cấu hình gia hạn</span>
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input checked class="w-4 h-4 accent-primary cursor-pointer" name="renew_type" type="radio" value="current" onchange="onRenewTypeChange('current')"/>
+                <span class="font-body-md text-body-md text-on-surface font-medium">Gia hạn gói hiện tại</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer opacity-75 hover:opacity-100 transition-opacity">
+                <input class="w-4 h-4 accent-primary cursor-pointer" name="renew_type" type="radio" value="upgrade" onchange="onRenewTypeChange('upgrade')"/>
+                <span class="font-body-md text-body-md text-on-surface flex items-center gap-1">
+                  Nâng cấp gói mới
+                  <span class="px-1.5 py-0.5 rounded text-[10px] bg-primary-fixed text-primary font-bold tracking-wide uppercase">Khuyên dùng</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Fast duration selection (Segmented controls) -->
+          <div class="grid grid-cols-3 gap-3">
+            <button id="renewBtn3M" onclick="selectRenewDuration(3, 2400000, 90)" class="duration-btn flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all text-center cursor-pointer border border-outline-variant/30" type="button">
+              <span class="font-title-md text-title-md font-semibold">+3 Tháng</span>
+              <span class="font-body-sm text-body-sm text-outline mt-0.5">2.400.000 đ</span>
+            </button>
+            <button id="renewBtn6M" onclick="selectRenewDuration(6, 4500000, 180)" class="duration-btn flex flex-col items-center justify-center p-3 rounded-xl bg-primary/10 text-primary ring-2 ring-primary font-semibold transition-all relative text-center cursor-pointer border border-primary" type="button">
+              <span class="font-title-md text-title-md text-primary font-bold">+6 Tháng</span>
+              <span class="font-body-sm text-body-sm text-primary/80 mt-0.5">4.500.000 đ</span>
+              <span class="absolute -top-2 right-2 px-1.5 py-0.2 rounded-full bg-primary text-on-primary font-label-sm text-[10px]" id="badgeSelected6M">Đang chọn</span>
+            </button>
+            <button id="renewBtn12M" onclick="selectRenewDuration(12, 7600000, 365)" class="duration-btn flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all relative text-center cursor-pointer border border-outline-variant/30" type="button">
+              <span class="font-title-md text-title-md font-semibold">+12 Tháng</span>
+              <span class="font-body-sm text-body-sm text-outline mt-0.5">7.600.000 đ (-20%)</span>
+              <span class="absolute -top-2 right-2 px-1.5 py-0.2 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-[10px] font-bold">Best Deal</span>
+            </button>
+          </div>
+
+          <!-- 2 Datepicker boxes side-by-side -->
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Box 1: Start Date -->
+            <div class="flex flex-col gap-1.5 p-3 rounded-xl bg-surface-container-low border border-outline-variant/20">
+              <span class="font-label-md text-label-md text-outline">Ngày bắt đầu mới</span>
+              <div class="flex items-center justify-between text-on-surface-variant">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px] text-outline">calendar_today</span>
+                  <span class="font-title-md text-title-md font-bold text-on-surface" id="modalRenewNewStartDate">27/09/2027</span>
+                </div>
+                <span class="material-symbols-outlined text-[16px] text-outline" title="Cố định">lock</span>
+              </div>
+              <span class="font-body-sm text-body-sm text-secondary flex items-center gap-1 font-medium">
+                <span>🔗</span> Nối tiếp hạn cũ
+              </span>
+            </div>
+
+            <!-- Box 2: New Expiry Date -->
+            <div class="flex flex-col gap-1.5 p-3 rounded-xl bg-surface-container-low border border-outline-variant/20">
+              <span class="font-label-md text-label-md text-tertiary font-bold">Ngày hết hạn mới</span>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px] text-tertiary">event_available</span>
+                  <span class="font-title-md text-title-md font-bold text-tertiary" id="modalRenewNewEndDate">27/03/2028</span>
+                </div>
+                <span class="material-symbols-outlined text-[16px] text-tertiary">verified</span>
+              </div>
+              <span class="font-body-sm text-body-sm text-tertiary flex items-center gap-1 font-semibold" id="modalRenewAddedDaysText">
+                <span>✓</span> Thời hạn thêm 180 ngày
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Khối 3: Bảng chốt phí & Thanh toán -->
+        <div class="flex flex-col gap-4">
+          <span class="font-title-lg text-title-lg text-on-surface tracking-tight font-bold">Chi tiết thanh toán</span>
+          
+          <!-- Pricing Summary Box -->
+          <div class="p-4 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-3 border border-outline-variant/20">
+            <div class="flex items-center justify-between font-body-md text-body-md text-on-surface-variant">
+              <span id="modalRenewBaseLabel">Giá niêm yết (Gói 6 Tháng):</span>
+              <span class="font-semibold text-on-surface" id="modalRenewBasePrice">4.500.000 đ</span>
+            </div>
+            <div class="flex items-center justify-between font-body-md text-body-md text-tertiary">
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">loyalty</span>
+                <span id="modalRenewDiscountLabel">Chiết khấu tri ân khách hàng (10%):</span>
+              </span>
+              <span class="font-semibold" id="modalRenewDiscountAmount">-450.000 đ</span>
+            </div>
+
+            <!-- Voucher Input Box -->
+            <div class="flex items-center gap-2 p-1.5 bg-surface-container-low rounded-lg border border-outline-variant/30">
+              <span class="material-symbols-outlined text-[18px] text-outline pl-1.5">confirmation_number</span>
+              <input id="modalRenewVoucherInput" oninput="onRenewVoucherChange(this.value)" class="bg-transparent text-on-surface font-title-md text-title-md outline-none w-full font-mono uppercase font-bold" placeholder="Nhập mã Voucher..." type="text" value="LOYALTY10"/>
+              <span id="modalRenewVoucherBadge" class="px-2 py-0.5 rounded bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold shrink-0">Áp dụng thành công</span>
+            </div>
+
+            <!-- Visual Separator -->
+            <div class="w-full h-[1px] bg-surface-container-highest my-1"></div>
+
+            <!-- Grand Total -->
+            <div class="flex items-baseline justify-between pt-1">
+              <div class="flex flex-col">
+                <span class="font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">Tổng cộng thanh toán</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">(Đã bao gồm VAT 8% &amp; Phí tiện ích)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-metric-display text-metric-display text-primary-container font-extrabold tracking-tight" id="modalRenewFinalTotal">4.050.000 đ</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method Selector -->
+          <div class="flex flex-col gap-2">
+            <span class="font-label-md text-label-md text-outline font-semibold">Hình thức thanh toán</span>
+            <div class="grid grid-cols-3 gap-3">
+              <!-- VietQR (Selected) -->
+              <button id="renewPayVietQR" onclick="selectRenewPaymentMethod('vietqr')" class="renew-pay-tile p-3 rounded-xl bg-primary/10 text-primary ring-2 ring-primary flex items-center justify-between transition-all cursor-pointer" type="button">
+                <div class="flex items-center gap-2.5">
+                  <span class="material-symbols-outlined text-[20px] text-primary">qr_code_2</span>
+                  <div class="flex flex-col text-left">
+                    <span class="font-title-md text-title-md font-bold leading-tight">VietQR</span>
+                    <span class="font-label-sm text-label-sm text-primary/70">Quét mã tức thì</span>
+                  </div>
+                </div>
+                <span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+              </button>
+
+              <!-- Tiền mặt -->
+              <button id="renewPayCash" onclick="selectRenewPaymentMethod('cash')" class="renew-pay-tile p-3 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container flex items-center justify-between transition-all cursor-pointer border border-outline-variant/30" type="button">
+                <div class="flex items-center gap-2.5">
+                  <span class="material-symbols-outlined text-[20px] text-outline">payments</span>
+                  <div class="flex flex-col text-left">
+                    <span class="font-title-md text-title-md font-medium leading-tight">Tiền mặt</span>
+                    <span class="font-label-sm text-label-sm text-outline">Thu tại quầy lễ tân</span>
+                  </div>
+                </div>
+              </button>
+
+              <!-- Quẹt thẻ POS -->
+              <button id="renewPayPOS" onclick="selectRenewPaymentMethod('pos')" class="renew-pay-tile p-3 rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-surface-container flex items-center justify-between transition-all cursor-pointer border border-outline-variant/30" type="button">
+                <div class="flex items-center gap-2.5">
+                  <span class="material-symbols-outlined text-[20px] text-outline">point_of_sale</span>
+                  <div class="flex flex-col text-left">
+                    <span class="font-title-md text-title-md font-medium leading-tight">Quẹt thẻ POS</span>
+                    <span class="font-label-sm text-label-sm text-outline">Visa / Master / Napas</span>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Action Bar -->
+      <div class="p-5 bg-surface-container-low/70 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-surface-container-high">
+        <div class="flex items-center gap-1.5 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px] text-tertiary">lock</span>
+          <span class="font-body-sm text-body-sm text-outline">Mã hóa 256-bit SSL • Tự động đồng bộ cổng Check-in</span>
+        </div>
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <button class="px-5 py-2.5 rounded-lg bg-surface-container-highest text-on-surface hover:bg-surface-container-high transition-colors font-title-md text-title-md font-medium cursor-pointer" onclick="closeRenewContractModal()" type="button">
+            Hủy bỏ
+          </button>
+          <button onclick="confirmRenewContract()" class="px-6 py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2 font-title-md text-title-md font-bold tracking-tight cursor-pointer active:scale-98" type="button">
+            <span class="material-symbols-outlined text-[18px]">bolt</span>
+            <span>Xác nhận Gia hạn &amp; In phiếu thu</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- JavaScript Xử lý Nghiệp vụ & Dữ liệu API -->
   <script src="/js/contract-detail.js"></script>
 
