@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="web_dashboard" name="shell-type" />
+  <title>Dashboard Tổng Quan | FitManage GYM &amp; YOGA SUITE</title>
+  <meta name="description" content="Bảng điều khiển tổng quan quản lý phòng tập gym và yoga - FitManage Suite v4.2" />
+
+  <!-- FitManage typography and icons -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=block" rel="stylesheet" />
+
+  <style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ccc3d7;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #7b7486;
+    }
+
+    /* Count-up animation helper */
+    .kpi-value {
+      transition: opacity 0.3s ease;
+    }
+    .kpi-value.counting {
+      opacity: 0.6;
+    }
+
+    /* Refresh icon spin */
+    @keyframes spin-once {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin-animation {
+      animation: spin-once 0.7s ease-in-out;
+    }
+
+    /* Smooth chart transition */
+    canvas {
+      transition: opacity 0.3s ease;
+    }
+
+    /* Search highlight */
+    .search-focused {
+      box-shadow: 0 0 0 3px rgba(0, 97, 114, 0.2) !important;
+    }
+
+    /* Activity item hover lift */
+    .activity-item {
+      transition: all 0.2s ease;
+    }
+    .activity-item:hover {
+      transform: translateX(4px);
+    }
+
+    /* Sidebar link hover animation */
+    .sidebar-link {
+      transition: all 0.2s ease;
+    }
+    .sidebar-link:hover {
+      transform: translateX(2px);
+    }
+  </style>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#F8F9FF",
+            "surface": "#F8F9FF",
+            "on-surface": "#0B1C30",
+            "on-surface-variant": "#4A4455",
+            "outline": "#7B7486",
+            "outline-variant": "#CCC3D7",
+            "primary": "#0B1C30",
+            "tertiary": "#004855",
+            "tertiary-container": "#006172",
+            "on-tertiary-container": "#57DFFF",
+            "tertiary-fixed": "#ACEDFF",
+            "on-tertiary-fixed": "#001F26",
+            "secondary": "#3A6285",
+            "secondary-fixed": "#CEE5FF",
+            "secondary-fixed-dim": "#A3CAF2",
+            "surface-container-lowest": "#FFFFFF",
+            "surface-container-low": "#EFF4FF",
+            "surface-container": "#E5EEFF",
+            "surface-container-high": "#DCE9FF",
+            "surface-container-highest": "#D3E4FE"
+          },
+          fontFamily: {
+            sans: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            body: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            display: ['DM Sans', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/topbar.css">
+  <script src="/js/sidebar.js" defer></script>
+  <script src="/js/topbar.js" defer></script>
+<link href="/css/permissions.css" rel="stylesheet">
+<script src="/js/auth-session.js"></script>
+<script src="/js/permissions.js"></script>
+</head>
+
+<body class="bg-[#F8F9FF] font-sans text-[#0B1C30] antialiased">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- LEFT SIDEBAR - Fixed Navigation                            -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <aside class="fixed left-0 top-0 h-screen w-64 bg-[#0B1C30] z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] text-white" data-fitmanage-sidebar aria-label="Sidebar FitManage"><a href="/dashboard.html">FitManage · Bảng điều khiển</a></aside>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- RIGHT CONTENT CONTAINER                                    -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="pl-64 flex flex-col min-h-screen">
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- TOP HEADER TOOLBAR                                      -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <header class="bg-white border-b border-slate-200/80 px-8 py-3.5 flex items-center justify-between sticky top-0 z-20 shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+      <!-- Left Breadcrumb & Live status -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+          <span class="hover:text-[#0B1C30] cursor-pointer transition-colors">Trang chủ</span>
+          <span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+          <span class="text-[#0B1C30] font-semibold">Bảng điều khiển tổng quan</span>
+        </div>
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-xs border border-emerald-100">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>07:00 – 23:00 Live</span>
+        </div>
+      </div>
+
+      <!-- Center Search Pill -->
+      <div class="hidden xl:block relative max-w-xs flex-1 mx-4">
+        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">search</span>
+        <input id="globalSearchInput"
+               class="w-full h-9 pl-9 pr-4 rounded-full bg-[#EFF4FF] border border-slate-200 text-xs text-[#0B1C30] placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#006172] focus:ring-1 focus:ring-[#006172] transition-colors"
+               placeholder="Tìm kiếm hội viên, hợp đồng, lớp học... (Ctrl+K)"
+               type="text" />
+      </div>
+
+      <!-- Right Actions: Language, Notification, User -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center rounded-lg bg-[#EFF4FF] p-0.5 text-xs font-semibold">
+          <button class="px-2 py-1 rounded bg-white text-[#0B1C30] shadow-xs">VN</button>
+          <span class="text-slate-300 px-0.5">|</span>
+          <button class="px-2 py-1 text-slate-500 hover:text-[#0B1C30] transition-colors">EN</button>
+        </div>
+        <button class="relative w-9 h-9 rounded-lg flex items-center justify-center text-slate-600 hover:bg-[#EFF4FF] hover:text-[#0B1C30] transition-colors" title="Thông báo">
+          <span class="material-symbols-outlined text-[20px]">notifications</span>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+        </button>
+        <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-full bg-[#6D28D9] flex items-center justify-center text-white font-bold text-xs shadow-sm">
+            CN
+          </div>
+          <div class="hidden xl:flex flex-col text-left">
+            <span class="text-xs font-bold text-[#0B1C30] leading-tight" data-user-name>Chí Nguyên</span>
+            <span class="text-[10px] text-slate-500 leading-none" data-user-role>Club Director</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!-- MAIN OPERATIONAL WORKSPACE                              -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <main class="w-full px-5 lg:px-8 py-7 flex flex-col gap-6 max-w-[1600px] mx-auto flex-1">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div><p class="text-xs font-bold text-[#006172] tracking-widest mb-2">FITMANAGE · GYM &amp; YOGA SUITE</p><h1 id="dashboard-title" class="text-3xl font-bold tracking-tight text-[#0b1c30]">Bảng điều khiển</h1><p id="dashboard-subtitle" class="text-sm text-slate-500 mt-2"></p></div>
+    <div class="flex gap-3 items-center">
+      <select id="periodFilter" aria-label="Kỳ báo cáo" data-permission="administration" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm">
+        <option value="current">Tháng này</option>
+        <option value="prev">Tháng trước</option>
+        <option value="quarter">Quý này</option>
+        <option value="year">Năm nay</option>
+      </select>
+      <button type="button" id="refreshBtn" class="flex items-center gap-2 bg-[#0b1c30] text-white rounded-xl px-4 py-2.5 text-sm font-semibold disabled:opacity-50">
+        <span class="material-symbols-outlined text-lg">refresh</span>Tải lại
+      </button>
+      <button type="button" id="exportRevenueBtn" data-permission="administration" class="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition-all shadow-sm cursor-pointer">
+        <span class="material-symbols-outlined text-lg">download</span>Xuất Excel
+      </button>
+    </div>
+  </div>
+  <p id="access-notice" class="text-sm text-amber-700" role="status"></p>
+  <p id="dashboard-status" class="text-xs text-slate-500" role="status">Đang tải dữ liệu…</p>
+  <div id="dashboard-data" class="flex flex-col gap-6" hidden>
+    <section aria-label="Chỉ số tổng quan" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <article class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"><div class="flex justify-between items-start gap-3"><p id="metric-label-1" class="text-xs uppercase tracking-wide font-bold text-slate-500"></p><span class="material-symbols-outlined text-[#006172] bg-[#eff4ff] rounded-xl p-2">monitoring</span></div><p id="metric-one" class="text-3xl font-bold text-[#0b1c30] mt-4">—</p></article><article class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"><div class="flex justify-between items-start gap-3"><p id="metric-label-2" class="text-xs uppercase tracking-wide font-bold text-slate-500"></p><span class="material-symbols-outlined text-emerald-600 bg-[#eff4ff] rounded-xl p-2">groups</span></div><p id="metric-two" class="text-3xl font-bold text-[#0b1c30] mt-4">—</p></article><article class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"><div class="flex justify-between items-start gap-3"><p id="metric-label-3" class="text-xs uppercase tracking-wide font-bold text-slate-500"></p><span class="material-symbols-outlined text-[#006172] bg-[#eff4ff] rounded-xl p-2">badge</span></div><p id="metric-three" class="text-3xl font-bold text-[#0b1c30] mt-4">—</p></article><article class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"><div class="flex justify-between items-start gap-3"><p id="metric-label-4" class="text-xs uppercase tracking-wide font-bold text-slate-500"></p><span class="material-symbols-outlined text-amber-600 bg-[#eff4ff] rounded-xl p-2">event_repeat</span></div><p id="metric-four" class="text-3xl font-bold text-[#0b1c30] mt-4">—</p></article>
+    </section>
+    <section data-permission="administration" aria-label="Báo cáo quản trị" class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+      <article class="xl:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h2 class="font-bold text-[#0b1c30]">Doanh thu &amp; Hội viên mới</h2><p id="finance-range" class="text-xs text-slate-500 mt-1"></p><p id="chart-status" role="status" class="text-xs text-amber-700"></p><div class="h-72 mt-5"><canvas id="revenueTrendChart" aria-label="Xu hướng doanh thu và hội viên mới" role="img"></canvas></div></article>
+      <article class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h2 class="font-bold text-[#0b1c30]">Cơ cấu doanh thu theo gói</h2><p id="packages-empty" class="text-xs text-slate-500 mt-1"></p><div class="h-72 mt-5"><canvas id="packageDonutChart" aria-label="Doanh thu theo gói tập" role="img"></canvas></div></article>
+      <article class="xl:col-span-3 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h2 class="font-bold text-[#0b1c30]">Tần suất check-in theo giờ</h2><p class="text-xs text-slate-500 mt-1">Trong kỳ báo cáo đã chọn</p><div class="h-56 mt-5"><canvas id="checkInHourlyChart" aria-label="Số lượt check-in theo giờ" role="img"></canvas></div></article>
+    </section>
+    <section aria-label="Tác vụ nhanh" class="flex flex-wrap gap-3"><a href="/members.html" class="px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-[#0b1c30]">Quản lý hội viên</a><a href="/create-contract.html" class="px-4 py-3 rounded-xl bg-[#0b1c30] text-white text-sm font-semibold">Lập hợp đồng</a><a href="/ai-retention-copilot.html" class="px-4 py-3 rounded-xl bg-violet-50 border border-violet-100 text-violet-700 text-sm font-semibold">Chăm sóc gia hạn</a><a href="/retention-report.html" data-permission="administration" class="px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-[#0b1c30]">Báo cáo tỷ lệ gia hạn</a></section>
+    <section class="grid grid-cols-1 xl:grid-cols-2 gap-5"><article class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><div class="flex justify-between gap-3"><h2 class="font-bold text-[#0b1c30]">Lịch lớp hôm nay</h2><a href="/schedules.html" class="text-xs text-[#006172] font-semibold">Xem thời khóa biểu</a></div><div id="today-classes" class="mt-3"></div></article><article class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm"><h2 class="font-bold text-[#0b1c30]">Ưu tiên chăm sóc gia hạn</h2><p class="text-xs text-slate-500 mt-1">Danh sách chưa xử lý, ưu tiên nguy cơ cao</p><div id="care-queue" class="mt-3"></div></article></section>
+  </div>
+</main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- CHART.JS v4 CDN + Dashboard Logic                         -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/js/dashboard.js" defer></script>
+</body>
+</html>

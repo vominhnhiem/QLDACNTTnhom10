@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>FitManage GYM &amp; YOGA SUITE</title>
+  <script src="/js/auth-session.js"></script>
+  <script>
+    const user = FitManageAuth.current();
+    window.location.replace(user ? FitManageAuth.destination(user) : '/login.html');
+  </script>
+</head>
+<body style="background:#0B304A; color:#fff; display:flex; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;">
+  <p>Đang mở FitManage… <a href="/login.html">Đăng nhập</a></p>
+</body>
+</html>

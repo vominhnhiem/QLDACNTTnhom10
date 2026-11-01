@@ -1,0 +1,501 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap');
+
+/* =========================================================================
+   ANIMATE UI — SEAMLESS ZERO-FLICKER PAGE TRANSITIONS (Linear/Stripe Standard)
+   Token: 180ms cubic-bezier(0.16, 1, 0.3, 1) | GPU Transform + Opacity Only
+   ========================================================================= */
+
+.fm-page-enter {
+  animation: fmPageFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes fmPageFadeIn {
+  from {
+    opacity: 0.88;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================================
+   SAFETY GUARDRAILS: Modals, overlays, toasts, and dialogs must NEVER
+   receive or inherit page-level entrance animations. They maintain their
+   own independent component state (opacity-0, pointer-events-none, hidden).
+   ========================================================================= */
+[id*="modal" i],
+[id*="toast" i],
+.modal-backdrop,
+.fixed.inset-0,
+[aria-modal="true"],
+[role="dialog"] {
+  animation: none !important;
+}
+
+/* Native Cross-Document View Transitions (Fallback & Modern Browser Support) */
+@view-transition {
+  navigation: auto;
+}
+
+[data-fitmanage-sidebar] {
+  view-transition-name: fitmanage-sidebar;
+}
+
+::view-transition-old(fitmanage-sidebar),
+::view-transition-new(fitmanage-sidebar) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
+}
+
+::view-transition-old(root) {
+  animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fmPageExit;
+}
+
+::view-transition-new(root) {
+  animation: 180ms cubic-bezier(0.16, 1, 0.3, 1) both fmPageEnter;
+}
+
+@keyframes fmPageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fmPageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+/* Accessibility: Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .fm-page-enter,
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
+/* =========================================================================
+   FITMANAGE UNIFIED SIDEBAR DESIGN SYSTEM (Be Vietnam Pro)
+   ========================================================================= */
+
+[data-fitmanage-sidebar] {
+  box-sizing: border-box !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 16rem !important; /* 256px = w-64 */
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 50 !important;
+  background: #0b1c30 !important;
+  color: #d5deeb !important;
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04) !important;
+}
+[data-fitmanage-sidebar] * { box-sizing: border-box; }
+
+/* 1. Brand Logo Header */
+.fm-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 18px;
+  color: #fff;
+  text-decoration: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fm-brand:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+.fm-logo {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #b5eff7;
+  color: #0b1c30;
+  font-size: 24px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fm-brand:hover .fm-logo {
+  transform: rotate(-3deg) scale(1.04);
+  box-shadow: 0 4px 12px rgba(181, 239, 247, 0.3);
+}
+.fm-brand strong { display: block; font-size: 18px; line-height: 1.2; font-weight: 700; color: #fff; }
+.fm-brand small { display: block; font-size: 9px; color: #a0b8d2; letter-spacing: 1.3px; margin-top: 4px; font-weight: 600; }
+
+/* 2. Navigation Scroll Area */
+.fm-nav {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 12px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #30455e transparent;
+}
+.fm-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.fm-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.fm-nav::-webkit-scrollbar-thumb {
+  background: #30455e;
+  border-radius: 4px;
+}
+.fm-nav::-webkit-scrollbar-thumb:hover {
+  background: #466282;
+}
+
+/* 3. Section Groups */
+.fm-group {
+  margin-bottom: 20px;
+}
+.fm-group:last-child {
+  margin-bottom: 0;
+}
+.fm-group h2 {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #7d96b3;
+  padding: 0 12px;
+  margin: 0 0 8px;
+}
+.fm-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* 4. Navigation Links */
+.fm-link {
+  position: relative;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #c6d3e3;
+  background: transparent;
+  text-decoration: none;
+  font: 500 13px/1.4 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+  text-align: left;
+  transition:
+    background-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.fm-link svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), color 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fm-label { flex: 1; min-width: 0; }
+
+@media (hover: hover) and (pointer: fine) {
+  a.fm-link:hover {
+    background: #172c43;
+    color: #ffffff;
+    transform: translateX(2px);
+  }
+  a.fm-link:hover svg {
+    transform: scale(1.06);
+    color: #8be4ff;
+  }
+}
+
+/* Animate UI Tactile Press Feedback */
+a.fm-link:active {
+  transform: scale(0.98);
+  transition: transform 75ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 5. Trạng thái Active: Nền sáng hơn, icon nổi bật, có indicator */
+.fm-link[aria-current='page'] {
+  background: #163b4e;
+  color: #a9eef5;
+  border-color: #285465;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+.fm-link[aria-current='page'] svg {
+  color: #57dfff;
+  stroke-width: 2;
+}
+.fm-link[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #22d3ee;
+  box-shadow: 0 0 8px #06b6d4;
+}
+.fm-link[aria-current='page']::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 8px #06b6d4;
+  margin-left: 8px;
+  flex-shrink: 0;
+  animation: fmDotPulse 3s ease-in-out infinite;
+}
+
+@keyframes fmDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    box-shadow: 0 0 12px #22d3ee;
+  }
+}
+
+/* Badges */
+.fm-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+.fm-badge-pulse {
+  background: #ff5449;
+  color: #ffffff;
+  box-shadow: 0 0 0 0 rgba(255, 84, 73, 0.7);
+  animation: fmPulse 2s infinite;
+}
+.fm-badge-ai {
+  background: #004e5c;
+  color: #57dfff;
+  border: 1px solid #006172;
+}
+
+@keyframes fmPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 84, 73, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(255, 84, 73, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 84, 73, 0);
+  }
+}
+
+/* 6. Footer Profile Card & AI Engine Status */
+.fm-footer {
+  padding: 12px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+.fm-engine {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.3) 0%, rgba(15, 23, 42, 0.5) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fm-engine:hover {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.42) 0%, rgba(15, 23, 42, 0.65) 100%);
+  border-color: rgba(16, 185, 129, 0.55);
+}
+.fm-engine-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fm-engine-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16, 185, 129, 0.6);
+  animation: fmDotPulse 2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+@keyframes fmDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 6px #10b981, 0 0 12px rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 12px #34d399, 0 0 20px rgba(52, 211, 153, 0.85);
+  }
+}
+.fm-engine-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.fm-engine-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  text-transform: uppercase;
+}
+.fm-engine-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #6ee7b7;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-left: 16px;
+}
+.fm-status-dot {
+  opacity: 0.5;
+  font-size: 9px;
+}
+.fm-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fm-profile:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.fm-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #6d28d9;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.fm-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.fm-meta strong {
+  font-size: 12px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+.fm-meta small {
+  font-size: 10px;
+  color: #8da4be;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fm-logout {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  color: #8da4be;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 150ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms cubic-bezier(0.16, 1, 0.3, 1), transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fm-logout:hover {
+  color: #ff857d;
+  background: rgba(255, 84, 73, 0.12);
+  transform: scale(1.08);
+}
+.fm-logout svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 7. Quick Modal Overlay Support */
+.fm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 28, 48, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.fm-modal {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(11, 28, 48, 0.25);
+  overflow: hidden;
+  border: 1px solid #dce9ff;
+  color: #0b1c30;
+}
